@@ -48,10 +48,11 @@ def view_the_log() -> 'html':
         cursor.execute(Query)
         log = cursor.fetchall()
 
-    for line in log:
-        contents.append(line)
+    #for line in log:
+    #    contents.append(line)
     titles = ('Form Data', 'Remote_addr', 'User_agnet', 'Results')
-    return render_template('viewlog.html', the_title='View Log', the_row_titles=titles, the_data=contents)
+    #return render_template('viewlog.html', the_title='View Log', the_row_titles=titles, the_data=contents)
+    return render_template('viewlog.html', the_title='View Log', the_row_titles=titles, the_data=log)
 
 
 if __name__ == '__main__':
