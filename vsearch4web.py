@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session
 from vsearch import search4letters
-from DBcm import UseDatabase
+from DBcm import UseDatabase, ConnectionError
 from checker import check_logged_in
 
 
@@ -46,10 +46,13 @@ def entry_page() -> 'html':
 @check_logged_in
 def view_the_log() -> 'html':
     try:
-        with UseDatabase (app.config['dbconfig']) as cursor:
+        with UseDatabase(app.config['dbconfig']) as cursor:
             Query = """Select phrase, IP, browser_string, results from log"""
             cursor.execute(Query)
             log = cursor.fetchall()
+    except ConnectionError as err:
+        print('""" Databse Could Not be connected', str(err))
+        log = ''
     except Exception as err:
         print('""" Databse Could Not be connected', str(err))
         log = ''
