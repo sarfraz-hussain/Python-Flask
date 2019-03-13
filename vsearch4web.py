@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, escape, session
+from flask import Flask, render_template, request, session
 from vsearch import search4letters
 from DBcm import UseDatabase
 from checker import check_logged_in
@@ -6,14 +6,6 @@ from checker import check_logged_in
 
 app = Flask(__name__)
 app.secret_key = 'YouWillNeverGuessMySecretKey'
-"""app.config['dbconfig'] = { 'host': 'shussain.mysql.pythonanywhere-services.com',
-                         'user': 'shussain',
-                         'password': 'sarfrazMySQL',
-                         'database': 'shussain$vsearchlogdb', }"""
-"""app.config['dbconfig'] = { 'host': '127.0.0.1',
-                         'user': 'root',
-                         'password': 'pakistan',
-                         'database': 'vsearchlogdb', }"""
 
 def log_request(req: 'flask-request', res: str) -> None:
 
@@ -37,8 +29,13 @@ def do_search() -> str:
     letters = request.form['letters']
     title = 'Here are your results: '
     results = str(search4letters(phrase, letters))
-    log_request(request, results)
-    return render_template('results.html', the_title=title, the_phrase=phrase, the_letters=letters, the_results=results)
+    try:
+        log_request(request, results)
+    except Exception as err:
+        print('DB right activity failed with error:', str(err))
+    return render_template ('results.html', the_title=title, the_phrase=phrase, the_letters=letters,
+                                the_results=results)
+    
 
 @app.route('/')
 @app.route('/entry')
@@ -48,17 +45,15 @@ def entry_page() -> 'html':
 @app.route('/viewlog')
 @check_logged_in
 def view_the_log() -> 'html':
-    contents = []
-    with UseDatabase (app.config['dbconfig']) as cursor:
-        #cursor = conn.cursor()
-        Query = """Select phrase, IP, browser_string, results from log"""
-        cursor.execute(Query)
-        log = cursor.fetchall()
-
-    #for line in log:
-    #    contents.append(line)
+    try:
+        with UseDatabase (app.config['dbconfig']) as cursor:
+            Query = """Select phrase, IP, browser_string, results from log"""
+            cursor.execute(Query)
+            log = cursor.fetchall()
+    except Exception as err:
+        print('""" Databse Could Not be connected', str(err))
+        log = ''
     titles = ('Form Data', 'Remote_addr', 'User_agnet', 'Results')
-    #return render_template('viewlog.html', the_title='View Log', the_row_titles=titles, the_data=contents)
     return render_template('viewlog.html', the_title='View Log', the_row_titles=titles, the_data=log)
 
 @app.route('/login')
