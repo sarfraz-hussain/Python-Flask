@@ -6,10 +6,14 @@ from checker import check_logged_in
 
 app = Flask(__name__)
 app.secret_key = 'YouWillNeverGuessMySecretKey'
-app.config['dbconfig'] = { 'host': 'shussain.mysql.pythonanywhere-services.com',
+"""app.config['dbconfig'] = { 'host': 'shussain.mysql.pythonanywhere-services.com',
                          'user': 'shussain',
                          'password': 'sarfrazMySQL',
-                         'database': 'shussain$vsearchlogdb', }
+                         'database': 'shussain$vsearchlogdb', }"""
+"""app.config['dbconfig'] = { 'host': '127.0.0.1',
+                         'user': 'root',
+                         'password': 'pakistan',
+                         'database': 'vsearchlogdb', }"""
 
 def log_request(req: 'flask-request', res: str) -> None:
 
@@ -68,4 +72,14 @@ def do_logout() -> str:
     return 'you are now logged out'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.config['dbconfig'] = {'host': '127.0.0.1',
+                              'user': 'root',
+                              'password': 'pakistan',
+                              'database': 'vsearchlogdb', }
+    app.run (debug=True)
+
+else:
+    app.config['dbconfig'] = { 'host': 'shussain.mysql.pythonanywhere-services.com',
+                             'user': 'shussain',
+                             'password': 'sarfrazMySQL',
+                             'database': 'shussain$vsearchlogdb', }
